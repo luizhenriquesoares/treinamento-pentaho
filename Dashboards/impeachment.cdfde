@@ -1,0 +1,37 @@
+{
+ "components": {
+  "rows": []
+ },
+ "datasources": {
+  "rows": []
+ },
+ "filename": "/public/impeachment.cdfde",
+ "layout": {
+  "rows": [
+   {
+    "id": "9b1ee098-23f2-84c3-a56f-491a75cb8f61",
+    "type": "LayoutResourceFile",
+    "typeDesc": "Resource",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "value": "",
+      "type": "Id"
+     },
+     {
+      "name": "resourceFile",
+      "value": "",
+      "type": "ResourceFile"
+     },
+     {
+      "name": "resourceType",
+      "value": "Css",
+      "type": "Label"
+     }
+    ]
+   }
+  ],
+  "title": "CDF - Sample structure"
+ }
+}

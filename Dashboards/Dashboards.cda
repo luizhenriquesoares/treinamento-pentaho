@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CDADescriptor>
+   <DataSources>
+      <Connection id="DSTeste" type="scripting.scripting">
+         <Initscript/>
+         <Language>beanshell</Language>
+      </Connection>
+      <Connection id="DSVoto" type="mondrian.jndi">
+         <Catalog>mondrian:/Camara</Catalog>
+         <Jndi>DW</Jndi>
+      </Connection>
+      <Connection id="DSSexoKPI" type="mondrian.jndi">
+         <Catalog>mondrian:/Camara</Catalog>
+         <Jndi>DW</Jndi>
+      </Connection>
+      <Connection id="DSIdadeKPI" type="mondrian.jndi">
+         <Catalog>mondrian:/Camara</Catalog>
+         <Jndi>DW</Jndi>
+      </Connection>
+      <Connection id="DSEscolaridadeKPI" type="mondrian.jndi">
+         <Catalog>mondrian:/Camara</Catalog>
+         <Jndi>DW</Jndi>
+      </Connection>
+      <Connection id="DSRacaKPI" type="mondrian.jndi">
+         <Catalog>mondrian:/Camara</Catalog>
+         <Jndi>DW</Jndi>
+      </Connection>
+      <Connection id="DSRegiaoBarras" type="mondrian.jndi">
+         <Catalog>mondrian:/Camara</Catalog>
+         <Jndi>DW</Jndi>
+      </Connection>
+      <Connection id="DSEstadosBarras" type="mondrian.jndi">
+         <Catalog>mondrian:/Camara</Catalog>
+         <Jndi>DW</Jndi>
+      </Connection>
+      <Connection id="DSTabela" type="mondrian.jndi">
+         <Catalog>mondrian:/Camara</Catalog>
+         <Jndi>DW</Jndi>
+      </Connection>
+   </DataSources>
+   <DataAccess access="public" connection="DSTeste" id="DSTeste" type="jsonScriptable">
+      <Name>DSTeste</Name>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Parameters/>
+      <Query><![CDATA[{
+  "resultset":[
+     ["C001", "Chocolate", "Sonho de valsa"],
+     ["C002", "Chocolate", "Serenata de amor"],
+     ["C003", "Chocolate", "Alpino barra"],
+     ["C004", "Chocolate", "Bis Xtra"],
+     ["C005", "Goma", "Chicletes"],
+     ["C006", "Goma", "Bubbaloo"],
+     ["C007", "Goma", "Trident"],
+     ["C008", "Goma", "Mentos"],
+     ["C009", "Goma", "Clorets"]
+  ],
+ 
+  "metadata":[
+     {"colIndex":0,"colType":"String","colName":"cod_produto"},
+     {"colIndex":1,"colType":"String","colName":"linha_produto"},
+     {"colIndex":2,"colType":"String","colName":"nome_produto"}
+  ]
+}]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="DSVoto" id="DSVoto" type="mdx">
+      <Name>DSVoto</Name>
+      <BandedMode>compact</BandedMode>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Output indexes="1,0" mode="include"/>
+      <Parameters/>
+      <Query><![CDATA[with member
+   [Measures].[uniqueName] as [Voto].currentMember.uniqueName
+ 
+select [Measures].[uniqueName] ON COLUMNS,
+   union(
+       [Voto].[Tudo],
+ 
+      filter(
+         [Voto].children,
+         [Voto].currentmember.name="NÃO" or [Voto].currentmember.name="SIM"
+      )
+   ) ON ROWS
+from [Impeachment]]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="DSSexoKPI" id="DSSexoKPI" type="mdx">
+      <Name>DSSexoKPI</Name>
+      <BandedMode>compact</BandedMode>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Output indexes="0" mode="exclude"/>
+      <Parameters>
+         <Parameter default="[Voto].[Tudo]" name="voto" type="String"/>
+      </Parameters>
+      <Query><![CDATA[WITH
+  MEMBER [Measures].[Percentual] as SUM([Sexo].currentMember) / SUM([Sexo].[Tudo]), FORMAT_STRING = '###0.00%'
+  Member [Measures].[Nome] as  [Sexo].currentMember.name
+SELECT
+ 
+  {[Measures].[Nome],[Measures].[Votos], [Measures].[Percentual]} ON COLUMNS,
+ 
+  Head(
+      Order(
+        [Sexo].children,
+        [Measures].[Votos], BDESC
+      )
+  ,1)
+ 
+ON ROWS
+FROM [Impeachment]
+where { ${voto} }]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="DSIdadeKPI" id="DSIdadeKPI" type="mdx">
+      <Name>DSIdadeKPI</Name>
+      <BandedMode>compact</BandedMode>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Output indexes="0" mode="exclude"/>
+      <Parameters>
+         <Parameter default="[Voto].[Tudo]" name="voto" type="String"/>
+      </Parameters>
+      <Query><![CDATA[WITH
+  MEMBER [Measures].[Percentual] as SUM([Faixa Etária].currentMember) / SUM([Faixa Etária].[Tudo]), FORMAT_STRING = '###0.00%'
+  Member [Measures].[Nome] as  [Faixa Etária].currentMember.name
+SELECT
+ 
+  {[Measures].[Nome],[Measures].[Votos], [Measures].[Percentual]} ON COLUMNS,
+ 
+  Head(
+      Order(
+        [Faixa Etária].children,
+        [Measures].[Votos], BDESC
+      )
+  ,1)
+ 
+ON ROWS
+FROM [Impeachment]
+where { ${voto} }]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="DSEscolaridadeKPI" id="DSEscolaridadeKPI"
+               type="mdx">
+      <Name>DSEscolaridadeKPI</Name>
+      <BandedMode>compact</BandedMode>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Output indexes="0" mode="exclude"/>
+      <Parameters>
+         <Parameter default="[Voto].[Tudo]" name="voto" type="String"/>
+      </Parameters>
+      <Query><![CDATA[WITH
+  MEMBER [Measures].[Percentual] as SUM([Grau de instrução].currentMember) / SUM([Grau de instrução].[Tudo]), FORMAT_STRING = '###0.00%'
+  Member [Measures].[Nome] as  [Grau de instrução].currentMember.name
+SELECT
+ 
+  {[Measures].[Nome],[Measures].[Votos], [Measures].[Percentual]} ON COLUMNS,
+ 
+  Head(
+      Order(
+        [Grau de instrução].children,
+        [Measures].[Votos], BDESC
+      )
+  ,1)
+ 
+ON ROWS
+FROM [Impeachment]
+where { ${voto} }]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="DSRacaKPI" id="DSRacaKPI" type="mdx">
+      <Name>DSRacaKPI</Name>
+      <BandedMode>compact</BandedMode>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Output indexes="0" mode="exclude"/>
+      <Parameters>
+         <Parameter default="[Voto].[Tudo]" name="voto" type="String"/>
+      </Parameters>
+      <Query><![CDATA[WITH
+  MEMBER [Measures].[Percentual] as SUM([Raça auto declarada].currentMember) / SUM([Raça auto declarada].[Tudo]), FORMAT_STRING = '###0.00%'
+  Member [Measures].[Nome] as  [Raça auto declarada].currentMember.name
+SELECT
+ 
+  {[Measures].[Nome],[Measures].[Votos], [Measures].[Percentual]} ON COLUMNS,
+ 
+  Head(
+      Order(
+        [Raça auto declarada].children,
+        [Measures].[Votos], BDESC
+      )
+  ,1)
+ 
+ON ROWS
+FROM [Impeachment]
+where { ${voto} }]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="DSRegiaoBarras" id="DSRegiaoBarras" type="mdx">
+      <Name>DSRegiaoBarras</Name>
+      <BandedMode>compact</BandedMode>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Parameters>
+         <Parameter default="[Voto].[Tudo]" name="voto" type="String"/>
+      </Parameters>
+      <Query><![CDATA[WITH
+  MEMBER [Measures].[absoluto] as iif(
+                                ${voto} is [Voto].[Tudo] ,
+                                sum([Measures].[Votos], [Voto].[Tudo]),
+                                sum([Measures].[Votos], ${voto})
+                            )
+ 
+SELECT
+ 
+      filter(
+          crossjoin(
+            [Voto].children,
+            [Measures].[Votos]
+          ),
+          [Voto].currentMember in { iif(
+                                        ${voto} is [Voto].[Tudo],
+                                        [Voto].[Tudo].children ,
+                                        ${voto}
+                                        )
+                                  }
+      )
+ 
+      ON COLUMNS,
+ 
+        order(
+            [UF].children
+          , [Measures].[absoluto]
+          , BDESC
+        )
+ 
+ 
+      ON ROWS
+ 
+ 
+FROM [Impeachment]]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="DSEstadosBarras" id="DSEstadosBarras" type="mdx">
+      <Name>DSEstadosBarras</Name>
+      <BandedMode>compact</BandedMode>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Parameters>
+         <Parameter default="[Voto].[Tudo]" name="voto" type="String"/>
+      </Parameters>
+      <Query><![CDATA[WITH
+  MEMBER [Measures].[absoluto] as iif(
+                                ${voto} is [Voto].[Tudo] ,
+                                sum([Measures].[Votos], [Voto].[Tudo]),
+                                sum([Measures].[Votos], ${voto})
+                            )
+ 
+SELECT
+ 
+      filter(
+          crossjoin(
+            [Voto].children,
+            [Measures].[Votos]
+          ),
+          [Voto].currentMember in { iif(
+                                        ${voto} is [Voto].[Tudo],
+                                        [Voto].[Tudo].children ,
+                                        ${voto}
+                                        )
+                                  }
+      )
+ 
+      ON COLUMNS,
+ 
+        order(
+            [UF].[UF].members
+          , [Measures].[absoluto]
+          , BDESC
+        )
+ 
+ 
+      ON ROWS
+ 
+ 
+FROM [Impeachment]]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="DSTabela" id="DSTabela" type="mdx">
+      <Name>DSTabela</Name>
+      <BandedMode>compact</BandedMode>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Output indexes="7" mode="exclude"/>
+      <Parameters>
+         <Parameter default="[Voto].[Tudo]" name="voto" type="String"/>
+         <Parameter default="[UF].[Tudo]" name="uf" type="String"/>
+      </Parameters>
+      <Query><![CDATA[SELECT
+  {[Measures].[Média de idade],[Measures].[Votos]} on columns,
+  non empty CROSSJOIN(
+    [Parlamentar].children,
+    Crossjoin(
+      [Ocupação].children,
+      Crossjoin(
+        [Raça auto declarada].children,
+        Crossjoin(
+          [Sigla].children,
+          Crossjoin(
+            Filter(
+                [Voto].children,
+                [Voto].currentMember in { iif(
+                                                ${voto} is [Voto].[Tudo],
+                                                [Voto].[Tudo].children ,
+                                                ${voto}
+                                                )
+                                          }
+                ),
+            Crossjoin(
+                [Condição].children,
+ 
+                filter(
+                    descendants(
+                        [UF],
+                        [UF].[UF]
+                    ),
+                    iif(
+                         "${uf}" = "[UF].[Tudo]"
+                        , [UF].currentmember is [UF].currentmember
+                        , [UF].currentmember.name = "${uf}"
+                    )
+                )
+ 
+            )
+          )
+        )
+      )
+    )
+  ) on Rows
+from [Impeachment]]]></Query>
+   </DataAccess>
+</CDADescriptor>
